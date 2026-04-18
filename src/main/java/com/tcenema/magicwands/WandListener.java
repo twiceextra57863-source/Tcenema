@@ -45,7 +45,7 @@ public class WandListener implements Listener {
     }
 
     private void startRitual(Player crafter, Location loc, WandType type) {
-        crafter.showTitle(Title.title(Component.text("6lRITUAL START"), Component.text("7Forging the " + type.getDisplayName())));
+        crafter.showTitle(Title.title(Component.text("§6§lRITUAL START"), Component.text("§7Forging the " + type.getDisplayName())));
         loc.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1f, 0.5f);
 
         new BukkitRunnable() {
@@ -73,7 +73,7 @@ public class WandListener implements Listener {
     }
 
     private void createBossBar(WandType type, Location loc) {
-        BossBar bar = Bukkit.createBossBar("6lFORGING: f" + type.getDisplayName(), BarColor.PURPLE, BarStyle.SOLID);
+        BossBar bar = Bukkit.createBossBar("§6§lFORGING: §f" + type.getDisplayName(), BarColor.PURPLE, BarStyle.SOLID);
         Bukkit.getOnlinePlayers().forEach(bar::addPlayer);
         loc.getWorld().playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, 1f, 1f);
         new BukkitRunnable() {
@@ -116,7 +116,7 @@ public class WandListener implements Listener {
         long lastUse = cooldowns.getOrDefault(p.getUniqueId(), 0L);
         long timeLeft = (lastUse + (type.getCooldown() * 1000L)) - System.currentTimeMillis();
         if (timeLeft > 0) {
-            p.sendMessage("cWait " + (timeLeft / 1000) + "s for the stand power to recharge.");
+            p.sendMessage("§cWait " + (timeLeft / 1000) + "s for the stand power to recharge.");
             return false;
         }
         cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
@@ -136,11 +136,11 @@ public class WandListener implements Listener {
         Location loc = p.getLocation();
         switch (type) {
             case STAR_PLATINUM -> {
-                p.sendMessage("5lSTAR PLATINUM: ORA ORA ORA!");
+                p.sendMessage("§5§lSTAR PLATINUM: ORA ORA ORA!");
                 new BukkitRunnable() {
                     int i = 0;
                     public void run() {
-                        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_PUNCH, 1f, 1.5f);
+                        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 1.5f);
                         p.getNearbyEntities(4, 4, 4).forEach(e -> {
                             if (e instanceof LivingEntity le && e != p) {
                                 Vector v = le.getLocation().toVector().subtract(p.getLocation().toVector()).normalize().multiply(0.5);
@@ -153,19 +153,19 @@ public class WandListener implements Listener {
                 }.runTaskTimer(plugin, 0, 2L);
             }
             case THE_WORLD -> {
-                p.sendMessage("elZA WARUDO! TOKI WO TOMARE!");
+                p.sendMessage("§e§lZA WARUDO! TOKI WO TOMARE!");
                 p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
                 List<Entity> frozen = p.getNearbyEntities(15, 15, 15);
                 frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(false); });
                 new BukkitRunnable() {
                     public void run() {
                         frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(true); });
-                        p.sendMessage("eTime begins to move again.");
+                        p.sendMessage("§eTime begins to move again.");
                     }
                 }.runTaskLater(plugin, 100L);
             }
             case KILLER_QUEEN -> {
-                p.sendMessage("dKiller Queen has already touched that target.");
+                p.sendMessage("§dKiller Queen has already touched that target.");
                 RayTraceResult target = p.getWorld().rayTraceEntities(p.getEyeLocation(), p.getEyeLocation().getDirection(), 15, (e) -> !e.equals(p));
                 if (target != null && target.getHitEntity() != null) {
                     new BukkitRunnable() {
