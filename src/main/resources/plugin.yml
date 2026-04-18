@@ -1,0 +1,6 @@
+name: MagicWands
+version: 1.0
+main: com.tcenema.magicwands.MagicWands
+api-version: '1.21'
+author: TcenemaAI
+description: Cinematic Magic Wands for Paper Servers
