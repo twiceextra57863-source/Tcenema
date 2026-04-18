@@ -1,6 +1,8 @@
 name: MagicWands
-version: 1.0
+version: 2.0
 main: com.tcenema.magicwands.MagicWands
-api-version: '1.21'
-author: TcenemaAI
-description: Cinematic Magic Wands for Paper Servers
+api-version: 1.21
+commands:
+  wand:
+    description: Main control command for MagicWands
+    usage: /wand <subcommand>
