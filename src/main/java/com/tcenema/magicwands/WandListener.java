@@ -17,6 +17,8 @@ public class WandListener implements Listener {
     private final MagicWands plugin;
     private final WandEffectManager effectManager;
     private final Map<UUID, Map<WandType, Long>> cooldowns = new HashMap<>();
+    
+    public static boolean particlesEnabled = true;
 
     public WandListener(MagicWands plugin) {
         this.plugin = plugin;
