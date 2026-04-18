@@ -13,9 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum WandType {
-    FROST_AEGIS("Frost Aegis", NamedTextColor.AQUA, Material.BLUE_ICE, 15, List.of("§bAbility: §fGlacial Spikes", "§8» Creates a 20x20 frozen arena.")),
-    INFERNO_LANCE("Inferno Lance", NamedTextColor.RED, Material.NETHER_STAR, 10, List.of("§cAbility: §fHellfire Storm", "§8» Calls down fire from the heavens.")),
-    DOMAIN_VOID("Void Domain", NamedTextColor.DARK_PURPLE, Material.ENDER_EYE, 30, List.of("§dAbility: §fDomain Expansion", "§8» Traps enemies in a void dimension."));
+    FROST_AEGIS("Frost Aegis", NamedTextColor.AQUA, Material.BLUE_ICE, 15, List.of("bAbility: fGlacial Spikes", "8bb Creates a frozen arena.")),
+    INFERNO_LANCE("Inferno Lance", NamedTextColor.RED, Material.NETHER_STAR, 10, List.of("cAbility: fHellfire Storm", "8bb Calls down fire.")),
+    DOMAIN_VOID("Void Domain", NamedTextColor.DARK_PURPLE, Material.ENDER_EYE, 30, List.of("dAbility: fDomain Expansion", "8bb Traps enemies in void.")),
+    STAR_PLATINUM("Star Platinum", NamedTextColor.DARK_PURPLE, Material.AMETHYST_SHARD, 20, List.of("5Ability: fORA ORA ORA!", "8bb Rapid strikes at your enemies.")),
+    THE_WORLD("The World", NamedTextColor.YELLOW, Material.GOLD_INGOT, 60, List.of("eAbility: fZA WARUDO!", "8bb Stops time for 5 seconds.")),
+    KILLER_QUEEN("Killer Queen", NamedTextColor.LIGHT_PURPLE, Material.TNT, 15, List.of("dAbility: fPrimary Bomb", "8bb Turns a target into a bomb."));
 
     private final String displayName;
     private final NamedTextColor color;
@@ -34,6 +37,7 @@ public enum WandType {
     public int getCooldown() { return cooldown; }
     public Material getRecipeCore() { return core; }
     public String getDisplayName() { return displayName; }
+    public NamedTextColor getColor() { return color; }
 
     public ItemStack getItem(MagicWands plugin) {
         ItemStack item = new ItemStack(Material.BLAZE_ROD);

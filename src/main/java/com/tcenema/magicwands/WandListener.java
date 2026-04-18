@@ -45,6 +45,9 @@ public class WandListener implements Listener {
     }
 
     private void startRitual(Player crafter, Location loc, WandType type) {
+        crafter.showTitle(Title.title(Component.text("6lRITUAL START"), Component.text("7Forging the " + type.getDisplayName())));
+        loc.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1f, 0.5f);
+
         new BukkitRunnable() {
             int ticks = 0;
             ArmorStand stand;
@@ -59,7 +62,7 @@ public class WandListener implements Listener {
                     stand.teleport(stand.getLocation().add(0, 0.05, 0));
                 }
                 stand.setRotation(stand.getLocation().getYaw() + 15, 0);
-                if (particlesEnabled) loc.getWorld().spawnParticle(Particle.WITCH, stand.getLocation().add(0, 1, 0), 5, 0.2, 0.2, 0.2, 0.05);
+                if (particlesEnabled) loc.getWorld().spawnParticle(Particle.WITCH, stand.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.05);
                 if (ticks++ > 60) {
                     createBossBar(type, loc);
                     stand.remove();
@@ -70,13 +73,16 @@ public class WandListener implements Listener {
     }
 
     private void createBossBar(WandType type, Location loc) {
-        BossBar bar = Bukkit.createBossBar("§6§lRITUAL: §f" + type.getDisplayName(), BarColor.PURPLE, BarStyle.SOLID);
+        BossBar bar = Bukkit.createBossBar("6lFORGING: f" + type.getDisplayName(), BarColor.PURPLE, BarStyle.SOLID);
         Bukkit.getOnlinePlayers().forEach(bar::addPlayer);
+        loc.getWorld().playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, 1f, 1f);
         new BukkitRunnable() {
             int time = 100; 
             public void run() {
                 if (time-- <= 0) {
                     loc.getWorld().dropItemNaturally(loc, type.getItem(plugin));
+                    loc.getWorld().spawnParticle(Particle.EXPLOSION, loc, 5);
+                    loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
                     bar.removeAll();
                     this.cancel();
                 }
@@ -110,7 +116,7 @@ public class WandListener implements Listener {
         long lastUse = cooldowns.getOrDefault(p.getUniqueId(), 0L);
         long timeLeft = (lastUse + (type.getCooldown() * 1000L)) - System.currentTimeMillis();
         if (timeLeft > 0) {
-            p.sendMessage("§cWait " + (timeLeft / 1000) + "s for the ether to recharge.");
+            p.sendMessage("cWait " + (timeLeft / 1000) + "s for the stand power to recharge.");
             return false;
         }
         cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
@@ -128,29 +134,49 @@ public class WandListener implements Listener {
 
     private void executeAbility(Player p, WandType type) {
         Location loc = p.getLocation();
-        p.getWorld().playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, 1f, 1f);
         switch (type) {
-            case FROST_AEGIS -> {
-                for (int i = 0; i < 360; i += 5) {
-                    double angle = Math.toRadians(i);
-                    Location spike = loc.clone().add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
-                    if (particlesEnabled) spike.getWorld().spawnParticle(Particle.SNOWFLAKE, spike, 10, 0.2, 2, 0.2, 0.05);
-                }
-                p.getNearbyEntities(5, 5, 5).stream().filter(e -> e instanceof LivingEntity && e != p).forEach(e -> ((LivingEntity) e).addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, 100, 2)));
-            }
-            case DOMAIN_VOID -> {
-                activeDomains.put(p.getUniqueId(), type);
-                p.sendMessage("§dDomain Expansion: Unlimited Void!");
+            case STAR_PLATINUM -> {
+                p.sendMessage("5lSTAR PLATINUM: ORA ORA ORA!");
                 new BukkitRunnable() {
-                    int t = 0;
+                    int i = 0;
                     public void run() {
-                        if (particlesEnabled) p.getWorld().spawnParticle(Particle.DRAGON_BREATH, p.getLocation(), 50, 3, 3, 3, 0.05);
-                        if (t++ > 200) {
-                            activeDomains.remove(p.getUniqueId());
-                            this.cancel();
-                        }
+                        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_PUNCH, 1f, 1.5f);
+                        p.getNearbyEntities(4, 4, 4).forEach(e -> {
+                            if (e instanceof LivingEntity le && e != p) {
+                                Vector v = le.getLocation().toVector().subtract(p.getLocation().toVector()).normalize().multiply(0.5);
+                                le.setVelocity(v);
+                                le.damage(2.0, p);
+                            }
+                        });
+                        if (i++ > 15) this.cancel();
                     }
-                }.runTaskTimer(plugin, 0, 1L);
+                }.runTaskTimer(plugin, 0, 2L);
+            }
+            case THE_WORLD -> {
+                p.sendMessage("elZA WARUDO! TOKI WO TOMARE!");
+                p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
+                List<Entity> frozen = p.getNearbyEntities(15, 15, 15);
+                frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(false); });
+                new BukkitRunnable() {
+                    public void run() {
+                        frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(true); });
+                        p.sendMessage("eTime begins to move again.");
+                    }
+                }.runTaskLater(plugin, 100L);
+            }
+            case KILLER_QUEEN -> {
+                p.sendMessage("dKiller Queen has already touched that target.");
+                RayTraceResult target = p.getWorld().rayTraceEntities(p.getEyeLocation(), p.getEyeLocation().getDirection(), 15, (e) -> !e.equals(p));
+                if (target != null && target.getHitEntity() != null) {
+                    new BukkitRunnable() {
+                        public void run() {
+                           target.getHitEntity().getWorld().createExplosion(target.getHitEntity().getLocation(), 3f, false, false);
+                        }
+                    }.runTaskLater(plugin, 20L);
+                }
+            }
+            case FROST_AEGIS -> {
+                p.getNearbyEntities(5, 5, 5).stream().filter(e -> e instanceof LivingEntity && e != p).forEach(e -> ((LivingEntity) e).addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 100, 2)));
             }
             case INFERNO_LANCE -> {
                 loc.getWorld().spawnParticle(Particle.FLAME, loc, 1000, 5, 2, 5, 0.02);
