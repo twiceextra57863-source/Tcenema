@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum WandType {
-    FROST_AEGIS("Frost Aegis", NamedTextColor.AQUA, Material.BLUE_ICE, 8, List.of("§7Frozen in the depths of Jotunheim.", "§bAbility: §fGlacial Pulse", "§8» Freezes all nearby enemies.")),
-    INFERNO_LANCE("Inferno Lance", NamedTextColor.RED, Material.NETHER_STAR, 5, List.of("§7Forged in the core of a dying sun.", "§cAbility: §fSolar Flare", "§8» Ignites a line of incinerating fire.")),
-    VOID_RIFT("Void Rift", NamedTextColor.DARK_PURPLE, Material.ENDER_EYE, 12, List.of("§7A shard of the End dimension itself.", "§dAbility: §fSingularity", "§8» Pulls all matter toward the user."));
+    FROST_AEGIS("Frost Aegis", NamedTextColor.AQUA, Material.BLUE_ICE, 15, List.of("§bAbility: §fGlacial Spikes", "§8» Creates a 20x20 frozen arena.")),
+    INFERNO_LANCE("Inferno Lance", NamedTextColor.RED, Material.NETHER_STAR, 10, List.of("§cAbility: §fHellfire Storm", "§8» Calls down fire from the heavens.")),
+    DOMAIN_VOID("Void Domain", NamedTextColor.DARK_PURPLE, Material.ENDER_EYE, 30, List.of("§dAbility: §fDomain Expansion", "§8» Traps enemies in a void dimension."));
 
     private final String displayName;
     private final NamedTextColor color;
@@ -33,17 +33,14 @@ public enum WandType {
 
     public int getCooldown() { return cooldown; }
     public Material getRecipeCore() { return core; }
+    public String getDisplayName() { return displayName; }
 
     public ItemStack getItem(MagicWands plugin) {
         ItemStack item = new ItemStack(Material.BLAZE_ROD);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text(displayName).color(color).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-        
         List<Component> finalLore = new ArrayList<>();
         for (String line : lore) finalLore.add(Component.text(line).decoration(TextDecoration.ITALIC, false));
-        finalLore.add(Component.empty());
-        finalLore.add(Component.text("§6[RIGHT CLICK TO USE]"));
-        
         meta.lore(finalLore);
         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "wand_type"), PersistentDataType.STRING, this.name());
         item.setItemMeta(meta);
