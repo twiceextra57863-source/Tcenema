@@ -19,27 +19,24 @@ public class WandCommand implements CommandExecutor {
             case "give" -> {
                 if (args.length < 3) return false;
                 Player target = Bukkit.getPlayer(args[1]);
-                if (target == null) return true;
-                try { target.getInventory().addItem(WandType.valueOf(args[2].toUpperCase()).getItem(plugin)); } catch (Exception e) { sender.sendMessage("§cInvalid Wand Type"); }
+                if (target == null) { sender.sendMessage("§cPlayer not found."); return true; }
+                try {
+                    WandType type = WandType.valueOf(args[2].toUpperCase());
+                    target.getInventory().addItem(type.getItem(plugin));
+                    sender.sendMessage("§aGave " + type.getDisplayName() + " to " + target.getName());
+                } catch (IllegalArgumentException e) { sender.sendMessage("§cInvalid Wand Type: " + args[2]); }
             }
-            case "list" -> sender.sendMessage("§bAvailable: §fFrost_Aegis, Inferno_Lance, Void_Rift");
+            case "list" -> sender.sendMessage("§bAvailable Wands: §fFrost_Aegis, Inferno_Lance, Domain_Void");
+            case "particles" -> {
+                WandListener.particlesEnabled = !WandListener.particlesEnabled;
+                sender.sendMessage("§7Particles: " + (WandListener.particlesEnabled ? "§aENABLED" : "§cDISABLED"));
+            }
+            case "stats" -> {
+                sender.sendMessage("§b--- Magic Stats ---");
+                sender.sendMessage("§fActive Domains: §e" + "Checking..."); 
+                sender.sendMessage("§fParticle Status: " + (WandListener.particlesEnabled ? "§aOnline" : "§cOffline"));
+            }
             case "reload" -> { plugin.reloadConfig(); sender.sendMessage("§aConfiguration Reloaded."); }
-            case "info" -> sender.sendMessage("§eMagicWands v2.0 - High Definition Module");
-            case "stats" -> sender.sendMessage("§7Server Magic Integrity: §a100%");
-            case "particles" -> sender.sendMessage("§7Particles: §aENABLED");
-            case "cooldown" -> sender.sendMessage("§7Current Action Bar Refresh: §f2 ticks");
-            case "debug" -> sender.sendMessage("§8[DEBUG] Thread Safety: Verified.");
-            case "reset" -> sender.sendMessage("§6All global cooldowns purged.");
-            case "clear" -> { if (sender instanceof Player p) p.getInventory().clear(); }
-            case "upgrade" -> sender.sendMessage("§cModule not yet integrated.");
-            case "sounds" -> sender.sendMessage("§7Audio Feedback: §aACTIVE");
-            case "recipe" -> sender.sendMessage("§7Recipes are dynamic. Check /recipe in-game.");
-            case "broadcast" -> Bukkit.broadcastMessage("§d[MagicWands] §fThe magical ether is vibrating!");
-            case "effects" -> sender.sendMessage("§7Visual Effects: §aULTRA");
-            case "version" -> sender.sendMessage("§bBuild: 2024.11.23-PRO");
-            case "setlore" -> sender.sendMessage("§eLore edit mode activated.");
-            case "setname" -> sender.sendMessage("§eName edit mode activated.");
-            case "save" -> sender.sendMessage("§aData synchronized to cloud.");
             case "help" -> sendHelp(sender);
             default -> sender.sendMessage("§cUnknown Command. Use /wand help.");
         }
@@ -48,6 +45,10 @@ public class WandCommand implements CommandExecutor {
 
     private void sendHelp(CommandSender s) {
         s.sendMessage("§b§l--- MagicWands Control Center ---");
-        s.sendMessage("§f/wand give <p> <t>, list, reload, info, stats, particles, cooldown, help, debug, reset, clear, upgrade, sounds, recipe, broadcast, effects, version, setlore, setname, save");
+        s.sendMessage("§f/wand give <player> <type> §7- Give a wand");
+        s.sendMessage("§f/wand list §7- List types");
+        s.sendMessage("§f/wand particles §7- Toggle effects");
+        s.sendMessage("§f/wand stats §7- Show system health");
+        s.sendMessage("§f/wand reload §7- Reload config");
     }
 }
