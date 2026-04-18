@@ -3,21 +3,17 @@ package com.tcenema.magicwands;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
-import net.md_5.bungee.api.ChatColor;
 
 public class MagicWands extends JavaPlugin {
-    private static MagicWands instance;
-
     @Override
     public void onEnable() {
-        instance = this;
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new WandListener(this), this);
+        getCommand("wand").setExecutor(new WandCommand(this));
         registerRecipes();
-        getLogger().info(ChatColor.AQUA + "[MagicWands] Module Online. Forging complete.");
+        getLogger().info("§b[MagicWands] Core Online. System Secure.");
     }
 
     private void registerRecipes() {
@@ -29,6 +25,4 @@ public class MagicWands extends JavaPlugin {
             Bukkit.addRecipe(recipe);
         }
     }
-
-    public static MagicWands getInstance() { return instance; }
 }
