@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.ChatColor;
 
 public class MagicWands extends JavaPlugin {
     private static MagicWands instance;
@@ -16,7 +17,7 @@ public class MagicWands extends JavaPlugin {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new WandListener(this), this);
         registerRecipes();
-        getLogger().info("§b[MagicWands] Module Online. Forging complete.");
+        getLogger().info(ChatColor.AQUA + "[MagicWands] Module Online. Forging complete.");
     }
 
     private void registerRecipes() {
