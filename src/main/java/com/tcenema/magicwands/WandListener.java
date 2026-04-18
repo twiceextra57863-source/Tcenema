@@ -8,8 +8,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,14 +35,18 @@ public class WandListener implements Listener {
         Player player = event.getPlayer();
         if (checkCooldown(player)) return;
 
-        WandType type = WandType.valueOf(typeStr);
-        executeAbility(player, type);
-        cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + 5000);
+        try {
+            WandType type = WandType.valueOf(typeStr);
+            executeAbility(player, type);
+            cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + 5000);
+        } catch (IllegalArgumentException e) {
+            // Invalid wand type stored
+        }
     }
 
     private boolean checkCooldown(Player p) {
         if (cooldowns.containsKey(p.getUniqueId()) && cooldowns.get(p.getUniqueId()) > System.currentTimeMillis()) {
-            p.sendMessage("§cRecharging magic... Wait " + ((cooldowns.get(p.getUniqueId()) - System.currentTimeMillis()) / 1000) + "s");
+            p.sendMessage(ChatColor.RED + "Recharging magic... Wait " + ((cooldowns.get(p.getUniqueId()) - System.currentTimeMillis()) / 1000) + "s");
             return true;
         }
         return false;
@@ -52,7 +59,7 @@ public class WandListener implements Listener {
                 p.getWorld().spawnParticle(Particle.SNOWFLAKE, loc, 100, 3, 1, 3, 0.1);
                 p.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1f, 0.5f);
                 for (Entity e : p.getNearbyEntities(5, 5, 5)) {
-                    if (e instanceof LivingEntity le) le.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 100, 10));
+                    if (e instanceof LivingEntity le) le.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 10));
                 }
             }
             case INFERNO_LANCE -> {
