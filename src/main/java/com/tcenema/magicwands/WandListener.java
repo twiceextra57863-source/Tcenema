@@ -33,9 +33,11 @@ public class WandListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         ItemStack result = event.getCurrentItem();
-        if (result == null || !result.hasItemMeta()) return;
+        if (result == null || !result.hasItemMeta())
+            return;
         String typeStr = result.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "wand_type"), PersistentDataType.STRING);
-        if (typeStr == null) return;
+        if (typeStr == null)
+            return;
 
         Player player = (Player) event.getWhoClicked();
         event.setCancelled(true);
@@ -51,6 +53,7 @@ public class WandListener implements Listener {
         new BukkitRunnable() {
             int ticks = 0;
             ArmorStand stand;
+
             public void run() {
                 if (ticks == 0) {
                     stand = loc.getWorld().spawn(loc.clone().add(0, 1, 0), ArmorStand.class);
@@ -62,7 +65,8 @@ public class WandListener implements Listener {
                     stand.teleport(stand.getLocation().add(0, 0.05, 0));
                 }
                 stand.setRotation(stand.getLocation().getYaw() + 15, 0);
-                if (particlesEnabled) loc.getWorld().spawnParticle(Particle.WITCH, stand.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.05);
+                if (particlesEnabled)
+                    loc.getWorld().spawnParticle(Particle.WITCH, stand.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.05);
                 if (ticks++ > 60) {
                     createBossBar(type, loc);
                     stand.remove();
@@ -77,7 +81,8 @@ public class WandListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(bar::addPlayer);
         loc.getWorld().playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, 1f, 1f);
         new BukkitRunnable() {
-            int time = 100; 
+            int time = 100;
+
             public void run() {
                 if (time-- <= 0) {
                     loc.getWorld().dropItemNaturally(loc, type.getItem(plugin));
@@ -95,13 +100,16 @@ public class WandListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         ItemStack item = event.getItem();
-        if (item == null || !item.hasItemMeta()) return;
+        if (item == null || !item.hasItemMeta())
+            return;
         String typeStr = item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "wand_type"), PersistentDataType.STRING);
-        if (typeStr == null) return;
+        if (typeStr == null)
+            return;
         WandType type = WandType.valueOf(typeStr);
 
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            if (activeDomains.containsKey(p.getUniqueId())) shootLaser(p);
+            if (activeDomains.containsKey(p.getUniqueId()))
+                shootLaser(p);
             return;
         }
 
@@ -116,7 +124,7 @@ public class WandListener implements Listener {
         long lastUse = cooldowns.getOrDefault(p.getUniqueId(), 0L);
         long timeLeft = (lastUse + (type.getCooldown() * 1000L)) - System.currentTimeMillis();
         if (timeLeft > 0) {
-            p.sendMessage("§cWait " + (timeLeft / 1000) + "s for the stand power to recharge.");
+            p.sendMessage("§cWait " + (timeLeft / 1000) + "s for the power to recharge.");
             return false;
         }
         cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
@@ -128,7 +136,8 @@ public class WandListener implements Listener {
         RayTraceResult ray = p.getWorld().rayTraceEntities(p.getEyeLocation(), p.getEyeLocation().getDirection(), 30, (e) -> !e.equals(p));
         if (ray != null && ray.getHitEntity() instanceof LivingEntity le) {
             le.damage(8.0, p);
-            if (particlesEnabled) le.getWorld().spawnParticle(Particle.SONIC_BOOM, le.getLocation().add(0, 1, 0), 1);
+            if (particlesEnabled)
+                le.getWorld().spawnParticle(Particle.SONIC_BOOM, le.getLocation().add(0, 1, 0), 1);
         }
     }
 
@@ -139,6 +148,7 @@ public class WandListener implements Listener {
                 p.sendMessage("§5§lSTAR PLATINUM: ORA ORA ORA!");
                 new BukkitRunnable() {
                     int i = 0;
+
                     public void run() {
                         p.getWorld().playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 1.5f);
                         p.getNearbyEntities(4, 4, 4).forEach(e -> {
@@ -148,7 +158,8 @@ public class WandListener implements Listener {
                                 le.damage(2.0, p);
                             }
                         });
-                        if (i++ > 15) this.cancel();
+                        if (i++ > 15)
+                            this.cancel();
                     }
                 }.runTaskTimer(plugin, 0, 2L);
             }
@@ -156,10 +167,16 @@ public class WandListener implements Listener {
                 p.sendMessage("§e§lZA WARUDO! TOKI WO TOMARE!");
                 p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
                 List<Entity> frozen = p.getNearbyEntities(15, 15, 15);
-                frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(false); });
+                frozen.forEach(e -> {
+                    if (e instanceof LivingEntity le)
+                        le.setAI(false);
+                });
                 new BukkitRunnable() {
                     public void run() {
-                        frozen.forEach(e -> { if(e instanceof LivingEntity le) le.setAI(true); });
+                        frozen.forEach(e -> {
+                            if (e instanceof LivingEntity le)
+                                le.setAI(true);
+                        });
                         p.sendMessage("§eTime begins to move again.");
                     }
                 }.runTaskLater(plugin, 100L);
@@ -170,7 +187,7 @@ public class WandListener implements Listener {
                 if (target != null && target.getHitEntity() != null) {
                     new BukkitRunnable() {
                         public void run() {
-                           target.getHitEntity().getWorld().createExplosion(target.getHitEntity().getLocation(), 3f, false, false);
+                            target.getHitEntity().getWorld().createExplosion(target.getHitEntity().getLocation(), 3f, false, false);
                         }
                     }.runTaskLater(plugin, 20L);
                 }
@@ -184,6 +201,49 @@ public class WandListener implements Listener {
                     e.setFireTicks(100);
                     ((LivingEntity) e).damage(10.0, p);
                 });
+            }
+            case THOR_HAMMER -> {
+                RayTraceResult ray = p.getWorld().rayTraceBlocks(p.getEyeLocation(), p.getEyeLocation().getDirection(), 50);
+                Location target = (ray != null) ? ray.getHitPosition().toLocation(p.getWorld()) : p.getLocation();
+                p.getWorld().strikeLightning(target);
+                p.sendMessage("§6Mjolnir obey my command!");
+            }
+            case EARTH_QUAKE -> {
+                p.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2f, 0.5f);
+                p.getNearbyEntities(8, 3, 8).stream().filter(e -> e instanceof LivingEntity && e != p).forEach(e -> {
+                    e.setVelocity(new Vector(0, 1.2, 0));
+                    ((LivingEntity) e).damage(12.0, p);
+                });
+                p.sendMessage("§2The Earth trembles!");
+            }
+            case GRAVITY_WELL -> {
+                p.getWorld().playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1f, 0.1f);
+                p.getNearbyEntities(15, 15, 15).stream().filter(e -> e instanceof LivingEntity && e != p).forEach(e -> {
+                    Vector pull = p.getLocation().toVector().subtract(e.getLocation().toVector()).normalize().multiply(2.0);
+                    e.setVelocity(pull);
+                });
+                p.sendMessage("§9Everything belongs to the center!");
+            }
+            case PHOENIX_WING -> {
+                p.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1f);
+                p.setVelocity(p.getEyeLocation().getDirection().multiply(3.0));
+                p.setFireTicks(0);
+                p.sendMessage("§6Burn bright like a Phoenix!");
+                new BukkitRunnable() {
+                    public void run() {
+                        p.getWorld().spawnParticle(Particle.FLAME, p.getLocation(), 50, 0.5, 0.5, 0.5, 0.1);
+                    }
+                }.runTaskLater(plugin, 5L);
+            }
+            case SONIC_BOOM -> {
+                p.getWorld().playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, 1f, 1f);
+                p.getWorld().spawnParticle(Particle.SONIC_BOOM, p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(2)), 1);
+                RayTraceResult ray = p.getWorld().rayTraceEntities(p.getEyeLocation(), p.getEyeLocation().getDirection(), 20, (e) -> !e.equals(p));
+                if (ray != null && ray.getHitEntity() instanceof LivingEntity le) {
+                    le.damage(15.0, p);
+                    le.setVelocity(p.getEyeLocation().getDirection().multiply(2.0));
+                }
+                p.sendMessage("§3Deep Dark's echo!");
             }
         }
     }
